@@ -42,7 +42,7 @@ Follow these steps to set up the project locally:
 
 1. **Clone the repository:**
    ```sh
-   git clone  https://github.com/Omozuas/superstore.git
+   git clone  https://github.com/Omozuas/nike_store.git
    cd nike_store
 2. **Install Flutter dependencies**
    flutter pub get
@@ -52,19 +52,29 @@ Follow these steps to set up the project locally:
 
 ## Screenshots
 
-1. **Product Page**
-![Product Page](assets/screenshots/productPage.png)
+1. **Home Page**
+![Home Page](assets/images/screenshot/homePage.png)
 
 2. **Cart Page**
-![Cart Page](assets/screenshots/cartPage.png)
+![Cart Page](assets/images/screenshot/cartPage.png)
 
 3. **Checkout Page**
-![Checkout Page](assets/screenshots/checkoutPage.png)
+![Checkout Page](assets/images/screenshot/checkoutPage.png)
 
-3. **viewProduct Page**
-![viewProduct Page](assets/screenshots/viewProductPage.png)
+3. **process Page**
+![process Page](assets/images/screenshot/proceedSheet.png)
 
-- **APK Download:** (https://appetize.io/app/b_3lgv26wx4uavzv6ejkjcxygr5m).
+4. **viewProduct Page**
+![viewProduct Page](assets/images/screenshot/viewProduct.png)
+
+5. **success Page**
+![success Page](assets/images/screenshot/succespage.png)
+
+6. **Cart Page**
+![Cart Page](assets/images/screenshot/cartPage.png)
+
+- **APK Download:** (https://tsfr.io/join/b6u4dr).
+- **APK debug link:** (https://appetize.io/app/b_2fmjq3p2uboqunv3w2e2oo5zgy).
 - **Contact Information:** 
 - **Name**:`Omozua Judah ` 
 - **Email**:`iyanuomozua.email@example.` 
