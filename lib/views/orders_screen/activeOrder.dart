@@ -98,15 +98,16 @@ class _ActiveOrderState extends State<ActiveOrder> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(
-                                onPressed: () {
-                                  get.removeOrderById(item.orderId!);
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  CupertinoIcons.trash,
-                                  color: GlobalColors.red,
-                                )),
+                            InkWell(
+                              onTap: () {
+                                get.removeOrderById(item.orderId!);
+                                setState(() {});
+                              },
+                              child: Icon(
+                                CupertinoIcons.trash,
+                                color: GlobalColors.red,
+                              ),
+                            )
                           ],
                         ),
                         ListView.builder(

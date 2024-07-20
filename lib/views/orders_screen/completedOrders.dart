@@ -62,15 +62,17 @@ class _CompletedOrdersState extends State<CompletedOrders> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
-                            IconButton(
-                                onPressed: () {
+                            InkWell(
+                              onTap: () {
+                                setState(() {
                                   get.removeOrderById(item.orderId!);
-                                  setState(() {});
-                                },
-                                icon: Icon(
-                                  CupertinoIcons.trash,
-                                  color: GlobalColors.red,
-                                )),
+                                });
+                              },
+                              child: Icon(
+                                CupertinoIcons.trash,
+                                color: GlobalColors.red,
+                              ),
+                            )
                           ],
                         ),
                         ListView.builder(
