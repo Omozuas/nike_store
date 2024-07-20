@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:nike_store/globalColor/colorsHex.dart';
 import 'package:nike_store/widgets/bottomNav/BottomNav.dart';
 
@@ -13,10 +14,7 @@ class SuccessfulScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(
-                'assets/images/Frame.png',
-                scale: .5,
-              ),
+              Lottie.asset("assets/animation/successPayment.json"),
               SizedBox(
                 height: 10,
               ),

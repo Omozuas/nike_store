@@ -1,7 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:nike_store/apis/models/orderModel.dart';
+import 'package:nike_store/db/cartdb.dart';
+import 'package:nike_store/db/orderdb.dart';
 import 'package:nike_store/globalColor/colorsHex.dart';
-import 'package:nike_store/views/succesfulPage_screen.dart';
+import 'package:nike_store/views/succesPayment_screen/succesfulPage_screen.dart';
+import 'package:nike_store/views/viewProducts_screen/viewProduct_screen.dart';
+import 'package:provider/provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
@@ -17,17 +22,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   TextEditingController fullnamecontroller = TextEditingController();
   TextEditingController emailcontroller = TextEditingController();
   TextEditingController numbercontroller = TextEditingController();
+  CartProvider cartProvider = CartProvider();
   void _checkout() async {
     if (formKey.currentState!.validate() &&
         formKey1.currentState!.validate() &&
         formKey2.currentState!.validate()) {
+      final get1 = Provider.of<CartProvider>(context, listen: false);
       Navigator.push(
           context, MaterialPageRoute(builder: (context) => SuccessfulScreen()));
+      get1.clearCart();
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final get1 = context.watch<CartProvider>();
+    final get2 = context.watch<OrderdbProvider>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -44,135 +54,175 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         padding: const EdgeInsets.only(left: 8, right: 8),
         child: Column(
           children: [
-            ListView.builder(
-                shrinkWrap: true,
-                itemCount: 4,
-                physics: NeverScrollableScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                itemBuilder: (context, index) {
-                  return Card(
-                    elevation: 0,
-                    color: Colors.white,
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 10, right: 10, top: 10, bottom: 10),
-                      child: Container(
-                        width: 500,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              width: 100,
-                              height: 120,
-                              decoration: BoxDecoration(
-                                color: GlobalColors.offWhite,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Center(
-                                child: Image.asset(
-                                  'assets/images/pair-trainers.png',
-                                  height: 80,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 15,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text('Ego Raid',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500)),
-                                    SizedBox(
-                                      width: 150,
-                                    ),
-                                    InkWell(
-                                      onTap: () {},
-                                      child: Icon(CupertinoIcons.clear),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
+            get1.loading
+                ? Center(child: CircularProgressIndicator())
+                : Padding(
+                    padding: const EdgeInsets.only(left: 8, right: 8),
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: cart.length,
+                        physics: NeverScrollableScrollPhysics(
+                            parent: AlwaysScrollableScrollPhysics()),
+                        itemBuilder: (context, index) {
+                          var item = cart[index];
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ViewproductScreen(
+                                            id: item.id,
+                                          )));
+                            },
+                            child: Card(
+                              color: Colors.white,
+                              elevation: 0,
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    left: 10, right: 10, top: 10, bottom: 10),
+                                child: Row(
                                   children: [
                                     Container(
-                                      width: 20,
-                                      height: 20,
+                                      width: 100,
+                                      height: 120,
                                       decoration: BoxDecoration(
-                                        color: GlobalColors.black,
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: const BorderRadius.all(
-                                            Radius.circular(3)),
+                                        color: GlobalColors.offWhite,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: Center(
+                                        child: Image.network(
+                                          'https://api.timbu.cloud/images/${item.img}',
+                                          height: 80,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
-                                      width: 7,
+                                      width: 15,
                                     ),
-                                    Text('Black',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500)),
-                                    SizedBox(
-                                      width: 7,
-                                    ),
-                                    Text('Size',
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500)),
-                                    SizedBox(
-                                      width: 7,
-                                    ),
-                                    Text('39',
-                                        style: TextStyle(
-                                            color: GlobalColors.black
-                                                .withOpacity(0.6),
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w500))
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text('${item.name}',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
+                                              InkWell(
+                                                onTap: () {
+                                                  setState(() {
+                                                    get1.removeFromCart(
+                                                        item.id);
+                                                  });
+                                                },
+                                                child:
+                                                    Icon(CupertinoIcons.clear),
+                                              )
+                                            ],
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width: 20,
+                                                    height: 20,
+                                                    decoration: BoxDecoration(
+                                                      color: item.color,
+                                                      shape: BoxShape.rectangle,
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .all(
+                                                              Radius.circular(
+                                                                  3)),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 7,
+                                                  ),
+                                                  Text('${item.colour}',
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500)),
+                                                  SizedBox(
+                                                    width: 7,
+                                                  ),
+                                                  Text('Size',
+                                                      style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500)),
+                                                  SizedBox(
+                                                    width: 7,
+                                                  ),
+                                                  Text('${item.size}',
+                                                      style: TextStyle(
+                                                          color: GlobalColors
+                                                              .black
+                                                              .withOpacity(0.6),
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w500))
+                                                ],
+                                              ),
+                                              SizedBox(
+                                                height: 10,
+                                              ),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    width: 25,
+                                                    height: 25,
+                                                    decoration: BoxDecoration(
+                                                        color: GlobalColors.blue
+                                                            .withOpacity(0.3),
+                                                        shape:
+                                                            BoxShape.rectangle,
+                                                        borderRadius:
+                                                            BorderRadius.all(
+                                                                Radius.circular(
+                                                                    5))),
+                                                    child: Center(
+                                                        child: Text(
+                                                            '${item.count}')),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 12,
+                                                  ),
+                                                  Text(
+                                                    '₦ ${item.price}',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 15),
+                                                  ),
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    )
                                   ],
                                 ),
-                                SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    Container(
-                                      width: 25,
-                                      height: 25,
-                                      decoration: BoxDecoration(
-                                          color: GlobalColors.blue
-                                              .withOpacity(0.3),
-                                          shape: BoxShape.rectangle,
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      child: Center(child: Text('1')),
-                                    ),
-                                    SizedBox(
-                                      width: 12,
-                                    ),
-                                    Text(
-                                      '₦ 37,000.00',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 15),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }),
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
             SizedBox(
               height: 20,
             ),
@@ -372,7 +422,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 fontSize: 16,
                                 color: GlobalColors.black.withOpacity(.7),
                                 fontWeight: FontWeight.w300)),
-                        Text('₦   185,000.00',
+                        Text('₦ ${get1.getTotalPrice().toStringAsFixed(2)}',
                             style: TextStyle(
                                 fontSize: 16,
                                 color: GlobalColors.black,
@@ -430,7 +480,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 fontSize: 16,
                                 color: GlobalColors.black.withOpacity(.7),
                                 fontWeight: FontWeight.w300)),
-                        Text('₦  186,550.00',
+                        Text('₦  ${get1.getTotalPrice() + 1550}',
                             style: TextStyle(
                                 fontSize: 16,
                                 color: GlobalColors.black,
@@ -455,10 +505,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               InkWell(
                 onTap: () {
-                  //   Navigator.push(
-                  //       context,
-                  //       MaterialPageRoute(
-                  //           builder: (context) => CheckoutScreen()));
+                  Navigator.pop(context);
                 },
                 child: Container(
                   width: 110,
@@ -566,7 +613,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                                             ],
                                                           ),
                                                           SizedBox(
-                                                            width: 120,
+                                                            width: 100,
                                                           ),
                                                           Radio(
                                                             onChanged: (v) {},
@@ -660,6 +707,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        final newOrder = Ordermodel(
+                                          name: numbercontroller.text,
+                                          email: emailcontroller.text,
+                                          phone: numbercontroller.text,
+                                          address: '123 Main St',
+                                          orderId: '',
+                                          status: 'pending',
+                                          productItem: cart,
+                                        );
+                                        get2.addOrder(newOrder);
                                         _checkout();
                                       },
                                       child: Container(

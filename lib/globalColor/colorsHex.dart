@@ -19,4 +19,8 @@ class GlobalColors {
   static HexColor green = HexColor('#09C53B');
   static HexColor pink = HexColor('#EC064F');
   static HexColor black = HexColor('#141B34');
+  static HexColor gradient3 = HexColor('#FFA500');
+  static HexColor gradient4 = HexColor('#FFCD00');
+  static HexColor gradient5 = HexColor('#292929');
+  static HexColor gradient6 = HexColor('#333333');
 }

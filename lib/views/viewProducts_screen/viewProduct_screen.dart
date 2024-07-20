@@ -1,19 +1,49 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:flutter_lorem/flutter_lorem.dart';
+import 'package:nike_store/apis/models/cart_model.dart';
+import 'package:nike_store/apis/timbu_api.dart';
+import 'package:nike_store/db/cartdb.dart';
+import 'package:nike_store/db/sharedPrefrence_db.dart';
+import 'package:nike_store/db/wishlistdb.dart';
 import 'package:nike_store/globalColor/colorsHex.dart';
-import 'package:nike_store/views/home-screen.dart';
+
+import 'package:nike_store/widgets/screen/productcard.dart';
+import 'package:nike_store/widgets/snackBarRes.dart';
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
+
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ViewproductScreen extends StatefulWidget {
-  const ViewproductScreen({super.key});
-
+  const ViewproductScreen({super.key, this.id});
+  final id;
   @override
   State<ViewproductScreen> createState() => _ViewproductScreenState();
 }
 
 class _ViewproductScreenState extends State<ViewproductScreen> {
+  DataBase dataBase = DataBase();
+  CartProvider cartProvider = CartProvider();
+  WishlistdbProvider wishlistdbProvider = WishlistdbProvider();
+  @override
+  void initState() {
+    super.initState();
+    getProduct();
+  }
+
+  void getProduct() async {
+    final get = Provider.of<ApiProvider>(context, listen: false);
+    get.getProduct();
+    await dataBase.getProductById(widget.id);
+    await dataBase.getProductsByCategoryIdOfProduct(widget.id);
+  }
+
+  String size = '';
+  String color = '';
+  Color? color2;
   int activeIndex = 2;
   String text = lorem(paragraphs: 1, words: 30);
   List<bool>? selected = [
@@ -40,12 +70,34 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
     false,
     false,
   ];
+
+  List<String> sizes = ['32', '33', '34', '35', '36', '37'];
+  List<String> colors = [
+    'deepyellow',
+    'purble',
+    'pink',
+    'green',
+    'yellow',
+    'black',
+    'blue'
+  ];
+  List<Color> colores = [
+    GlobalColors.deepyellow,
+    GlobalColors.purble,
+    GlobalColors.pink,
+    GlobalColors.green,
+    GlobalColors.yellow,
+    GlobalColors.black,
+    GlobalColors.blue,
+  ];
   void handleTap(int index) {
     setState(() {
       for (int i = 0; i < selected!.length; i++) {
         selected![i] = i == index;
       }
+      size = sizes[index];
     });
+    print('Selected size: ${sizes[index]}');
   }
 
   void handleTap2(int index) {
@@ -53,6 +105,8 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
       for (int i = 0; i < selected1!.length; i++) {
         selected1![i] = i == index;
       }
+      color = colors[index];
+      color2 = colores[index];
     });
   }
 
@@ -74,11 +128,15 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final get = context.watch<DataBase>();
+    final get1 = context.watch<ApiProvider>();
+    final get2 = context.watch<WishlistdbProvider>();
+    final get3 = context.watch<CartProvider>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: GlobalColors.offWhite,
         leading: IconButton(
-          onPressed: () {
+          onPressed: () async {
             Navigator.pop(context);
           },
           icon: Icon(Icons.arrow_back_ios),
@@ -87,39 +145,78 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
       body: SingleChildScrollView(
           child: Column(
         children: [
-          Stack(children: [
-            Container(
-              width: 500,
-              height: 280,
-              decoration: BoxDecoration(color: GlobalColors.offWhite),
-              child: CarouselSlider.builder(
-                itemCount: 4,
-                itemBuilder: (context, index, realindex) {
-                  return Image.asset(
-                    'assets/images/pair-trainers.png',
-                    scale: .8,
-                  );
-                },
-                options: CarouselOptions(
-                    initialPage: 0,
-                    viewportFraction: 1,
-                    autoPlay: true,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        activeIndex = index;
-                      });
-                    },
-                    // aspectRatio: 16 / 2,
-                    scrollDirection: Axis.horizontal,
-                    autoPlayInterval: Duration(seconds: 7),
-                    enlargeCenterPage: true,
-                    enlargeFactor: 0.8,
-                    autoPlayCurve: Curves.easeIn,
-                    disableCenter: true),
-              ),
-            ),
-            Positioned(bottom: 10, right: 180, child: buildIndicator()),
-          ]),
+          get1.loading
+              ? Shimmer.fromColors(
+                  baseColor: GlobalColors.offWhite,
+                  highlightColor: GlobalColors.gray,
+                  child: Stack(children: [
+                    Container(
+                      width: 500,
+                      height: 280,
+                      decoration: BoxDecoration(color: GlobalColors.offWhite),
+                      child: CarouselSlider.builder(
+                        itemCount: get.loading ? 0 : product!.photos.length,
+                        itemBuilder: (context, index, realindex) {
+                          return Image.network(
+                            "https://api.timbu.cloud/images/${product!.photos[index].url}",
+                            scale: .8,
+                          );
+                        },
+                        options: CarouselOptions(
+                            initialPage: 0,
+                            viewportFraction: 1,
+                            autoPlay: true,
+                            onPageChanged: (index, reason) {
+                              setState(() {
+                                activeIndex = index;
+                              });
+                            },
+                            // aspectRatio: 16 / 2,
+                            scrollDirection: Axis.horizontal,
+                            autoPlayInterval: Duration(seconds: 7),
+                            enlargeCenterPage: true,
+                            enlargeFactor: 0.8,
+                            autoPlayCurve: Curves.easeIn,
+                            disableCenter: true),
+                      ),
+                    ),
+                    Positioned(
+                        bottom: 10, right: 180, child: buildIndicator(get)),
+                  ]))
+              : Stack(children: [
+                  Container(
+                    width: 500,
+                    height: 280,
+                    decoration: BoxDecoration(color: GlobalColors.offWhite),
+                    child: CarouselSlider.builder(
+                      itemCount: get.loading ? 0 : product!.photos.length,
+                      itemBuilder: (context, index, realindex) {
+                        return Image.network(
+                          "https://api.timbu.cloud/images/${product!.photos[index].url}",
+                          scale: .8,
+                        );
+                      },
+                      options: CarouselOptions(
+                          initialPage: 0,
+                          viewportFraction: 1,
+                          autoPlay: true,
+                          onPageChanged: (index, reason) {
+                            setState(() {
+                              activeIndex = index;
+                            });
+                          },
+                          // aspectRatio: 16 / 2,
+                          scrollDirection: Axis.horizontal,
+                          autoPlayInterval: Duration(seconds: 7),
+                          enlargeCenterPage: true,
+                          enlargeFactor: 0.8,
+                          autoPlayCurve: Curves.easeIn,
+                          disableCenter: true),
+                    ),
+                  ),
+                  Positioned(
+                      bottom: 10, right: 180, child: buildIndicator(get)),
+                ]),
           SizedBox(
             height: 10,
           ),
@@ -129,7 +226,7 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Iconic Casual Brands',
+                  get1.loading ? 'loading..' : '${product!.urlSlug}',
                   style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14),
                 ),
                 Row(
@@ -140,12 +237,16 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Ego Vessel',
+                          get1.loading
+                              ? 'loading..'
+                              : '${product!.name}'.toUpperCase(),
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 20),
                         ),
                         Text(
-                          '₦ 37,000.00',
+                          get1.loading
+                              ? 'loading..'
+                              : '₦${product!.currentPrice[0].ngn[0]}0',
                           style: TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 15),
                         ),
@@ -174,19 +275,25 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
                       ],
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () {
+                        get2.toggleWishlist(product!);
+                      },
                       child: Container(
                           width: 35,
                           height: 35,
                           child: Center(
                               child: Icon(
-                            CupertinoIcons.heart_fill,
+                            get2.isWishlisted(product!.id)
+                                ? CupertinoIcons.heart_fill
+                                : CupertinoIcons.heart,
                             color: Colors.white,
                           )),
                           decoration: BoxDecoration(
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(100)),
-                            color: GlobalColors.red,
+                            color: get2.isWishlisted(product!.id)
+                                ? GlobalColors.red
+                                : GlobalColors.deepgray,
                           )),
                     ),
                   ],
@@ -388,26 +495,114 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
                         mainAxisSpacing: 12,
                         crossAxisSpacing: 16,
                         mainAxisExtent: 300),
-                    itemCount: 4,
+                    itemCount:
+                        get.loading ? 0 : productsWithSameCategoryId.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return ProductCard(
-                        selcetContainer: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ViewproductScreen()));
-                        },
-                        wishlist: () {},
-                        cartBtn: () {},
-                        productImg:
-                            "assets/images/victor-olamide-ajibola-5emTz0Gv2rI-unsplash-removebg-preview.png",
-                        pbrand: 'Athletic/Sportswear',
-                        pname: 'Air Jordan running sneaker',
-                        pRating: '4.5',
-                        stock: "100",
-                        pCurrentPrice: '₦ 28,000.00',
-                        oldPrice: '₦ 45,000.00',
-                      );
+                      var item = productsWithSameCategoryId[index];
+                      return get1.loading
+                          ? Shimmer.fromColors(
+                              baseColor: GlobalColors.offWhite,
+                              highlightColor: GlobalColors.gray,
+                              child: ProductCard(
+                                selcetContainer: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ViewproductScreen(
+                                                id: item.id,
+                                              )));
+                                },
+                                wishlist: () {
+                                  get2.toggleWishlist(item);
+                                  if (get2.isWishlisted(item.id)) {
+                                    return success(
+                                        context: context,
+                                        message:
+                                            '${item.name} removed from wishlist');
+                                  } else {
+                                    return success(
+                                        context: context,
+                                        message:
+                                            '${item.name} added to wishlist');
+                                  }
+                                },
+                                cartBtn: () {
+                                  var items = CartModel(
+                                      id: item.id,
+                                      name: item.name,
+                                      colour: 'black',
+                                      size: '',
+                                      price: item.currentPrice[0].ngn[0],
+                                      count: 1,
+                                      img: "${item.photos[0].url}",
+                                      color: GlobalColors.black);
+                                  get3.addToCart(items);
+                                  print('${item.photos[0].url}');
+                                  success(
+                                      context: context,
+                                      message: '${item.name} added to cart');
+                                },
+                                productImg:
+                                    "https://api.timbu.cloud/images/${item.photos[0].url}",
+                                pbrand: '${item.urlSlug}',
+                                pname: '${item.name}',
+                                pRating: '4.5',
+                                stock: "${item.availableQuantity}",
+                                pCurrentPrice:
+                                    '₦${item.currentPrice[0].ngn[0]}0',
+                                oldPrice: '₦ 45,000.00',
+                                isWishlisted: get2.isWishlisted(item.id),
+                              ))
+                          : ProductCard(
+                              selcetContainer: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ViewproductScreen(
+                                              id: item.id,
+                                            )));
+                              },
+                              wishlist: () {
+                                get2.toggleWishlist(item);
+                                if (get2.isWishlisted(item.id)) {
+                                  return success(
+                                      context: context,
+                                      message:
+                                          '${item.name} removed from wishlist');
+                                } else {
+                                  return success(
+                                      context: context,
+                                      message:
+                                          '${item.name} added to wishlist');
+                                }
+                              },
+                              cartBtn: () {
+                                var items = CartModel(
+                                    id: item.id,
+                                    name: item.name,
+                                    colour: 'black',
+                                    size: '',
+                                    price: item.currentPrice[0].ngn[0],
+                                    count: 1,
+                                    img: "${item.photos[0].url}",
+                                    color: GlobalColors.black);
+                                get3.addToCart(items);
+                                print('${item.photos[0].url}');
+                                success(
+                                    context: context,
+                                    message: '${item.name} added to cart');
+                              },
+                              productImg:
+                                  "https://api.timbu.cloud/images/${item.photos[0].url}",
+                              pbrand: '${item.urlSlug}',
+                              pname: '${item.name}',
+                              pRating: '4.5',
+                              stock: "${item.availableQuantity}",
+                              pCurrentPrice: '₦${item.currentPrice[0].ngn[0]}0',
+                              oldPrice: '₦ 45,000.00',
+                              isWishlisted: get2.isWishlisted(item.id),
+                            );
                     }),
               ],
             ),
@@ -430,17 +625,40 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
                     'Total Price',
                     style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        color: GlobalColors.offWhite,
+                        color: GlobalColors.black.withOpacity(.7),
                         fontSize: 15),
                   ),
                   Text(
-                    '₦ 37,000.00',
+                    get1.loading
+                        ? 'loading..'
+                        : '₦${product!.currentPrice[0].ngn[0]}0',
                     style: TextStyle(fontWeight: FontWeight.w500, fontSize: 19),
                   ),
                 ],
               ),
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  if (color.isEmpty) {
+                    error(context: context, message: 'select a color');
+                  } else if (size.isEmpty) {
+                    error(context: context, message: 'select a size');
+                  } else {
+                    var item = CartModel(
+                        id: product!.id,
+                        name: product!.name,
+                        colour: color,
+                        size: size,
+                        price: product!.currentPrice[0].ngn[0],
+                        count: _counter,
+                        img: "${product!.photos[0].url}",
+                        color: color2!);
+                    cartProvider.addToCart(item);
+                    print('${product!.photos[0].url}');
+                    success(
+                        context: context,
+                        message: '${product!.name} added to cart');
+                  }
+                },
                 child: Container(
                   width: 130,
                   height: 40,
@@ -478,7 +696,7 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
     );
   }
 
-  Widget buildIndicator() {
+  Widget buildIndicator(get) {
     return AnimatedSmoothIndicator(
         effect: ExpandingDotsEffect(
           dotWidth: 10,
@@ -488,7 +706,7 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
           activeDotColor: GlobalColors.blue,
         ),
         activeIndex: activeIndex,
-        count: 4);
+        count: get.loading ? 0 : product!.photos.length);
   }
 }
 
