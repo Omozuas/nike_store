@@ -121,6 +121,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                                 builder: (context) => CartpageScreen()));
                       },
                       child: Container(
+                        width: 34,
                         color: Colors.transparent,
                         child: Stack(children: [
                           Column(
@@ -139,7 +140,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                             ],
                           ),
                           Positioned(
-                            right: -2,
+                            right: 0.3,
                             child: Container(
                               padding: EdgeInsets.all(1),
                               decoration: BoxDecoration(

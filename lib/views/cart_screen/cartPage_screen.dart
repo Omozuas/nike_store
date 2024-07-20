@@ -5,6 +5,7 @@ import 'package:nike_store/db/cartdb.dart';
 import 'package:nike_store/globalColor/colorsHex.dart';
 import 'package:nike_store/views/checkout_screen/CheckOut_screen.dart';
 import 'package:nike_store/views/viewProducts_screen/viewProduct_screen.dart';
+import 'package:nike_store/widgets/snackBarRes.dart';
 import 'package:provider/provider.dart';
 
 class CartpageScreen extends StatefulWidget {
@@ -297,10 +298,14 @@ class _CartpageScreenState extends State<CartpageScreen> {
               ),
               InkWell(
                 onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => CheckoutScreen()));
+                  if (cart.isEmpty) {
+                    error(context: context, message: 'cart is empty');
+                  } else {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CheckoutScreen()));
+                  }
                 },
                 child: Container(
                   width: 110,

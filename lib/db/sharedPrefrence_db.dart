@@ -81,7 +81,6 @@ class DataBase with ChangeNotifier {
         setLoading(false);
         notifyListeners();
       }
-      print(product!.name);
       setLoading(false);
       notifyListeners();
     }

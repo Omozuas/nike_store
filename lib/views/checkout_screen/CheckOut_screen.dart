@@ -785,6 +785,7 @@ Widget textFiled(
     keyboardType4,
     validate,
     onchange,
+    maxLength,
     keys,
     obscureText = false}) {
   return Form(
@@ -807,6 +808,7 @@ Widget textFiled(
           controller: controller2,
           keyboardType: keyboardType4,
           obscureText: obscureText,
+          maxLength: maxLength,
           decoration: InputDecoration(
               suffixIcon: suffixIcon2,
               errorText: err,

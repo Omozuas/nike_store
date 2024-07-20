@@ -42,6 +42,7 @@ class _AllProductState extends State<AllProduct> {
   Widget build(BuildContext context) {
     final get1 = context.watch<ApiProvider>();
     final get = context.watch<WishlistdbProvider>();
+    final get2 = context.watch<CartProvider>();
     return SafeArea(
       child: Padding(
         padding: const EdgeInsets.only(left: 5.0, right: 5),
@@ -97,7 +98,7 @@ class _AllProductState extends State<AllProduct> {
                                   count: 1,
                                   img: "${item.photos[0].url}",
                                   color: GlobalColors.black);
-                              cartProvider.addToCart(items);
+                              get2.addToCart(items);
                               success(
                                   context: context,
                                   message: '${item.name} added to cart');
@@ -144,7 +145,7 @@ class _AllProductState extends State<AllProduct> {
                                 count: 1,
                                 img: "${item.photos[0].url}",
                                 color: GlobalColors.black);
-                            cartProvider.addToCart(items);
+                            get2.addToCart(items);
                             success(
                                 context: context,
                                 message: '${item.name} added to cart');
