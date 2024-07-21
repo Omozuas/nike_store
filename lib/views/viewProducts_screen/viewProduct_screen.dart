@@ -652,7 +652,7 @@ class _ViewproductScreenState extends State<ViewproductScreen> {
                         count: _counter,
                         img: "${product!.photos[0].url}",
                         color: color2!);
-                    cartProvider.addToCart(item);
+                    get3.addToCart(item);
                     print('${product!.photos[0].url}');
                     success(
                         context: context,

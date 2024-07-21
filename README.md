@@ -97,7 +97,7 @@ Follow these steps to set up the project locally:
 ![CompletedOrder Page](assets/screenshot/wishlistPage.png) ![Empty CompletedOrder Page](assets/screenshot/completedOrderPage.png)
 
 - **APK Download:** (https://tsfr.io/join/b6u4dr).
-- **APK debug link:** (https://appetize.io/app/b_i2it6dxfoapcvci6z6jvvkiuiy).
+- **APK debug link:** (https://appetize.io/app/b_grltvxj75gapfrzcgo3vel4kdi).
 - **Contact Information:** 
 - **Name**:`Omozua Judah ` 
 - **Email**:`iyanuomozua.email@example.` 
