@@ -55,80 +55,132 @@ class _WishListPageState extends State<WishListPage> {
         ),
         title: Text('My wishlist'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(left: 5.0, right: 5),
-        child: Column(
-          children: [
-            get.wishlist.isEmpty
-                ? Center(
-                    child: Container(
-                        height: 500,
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Lottie.asset(
-                                  "assets/animation/emptywishlist.json"),
-                              Text(
-                                  "You have not added any item to your wish list",
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.w500)),
-                              SizedBox(
-                                height: 20,
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                    left: 10.0, right: 10),
-                                child: InkWell(
-                                  onTap: () {
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 5.0, right: 5),
+          child: Column(
+            children: [
+              get.wishlist.isEmpty
+                  ? Center(
+                      child: Container(
+                          height: 500,
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Lottie.asset(
+                                    "assets/animation/emptywishlist.json"),
+                                Text(
+                                    "You have not added any item to your wish list",
+                                    style: TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.w500)),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 10.0, right: 10),
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BottomNavigation()));
+                                    },
+                                    child: Container(
+                                      width: 400,
+                                      height: 50,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(7.0),
+                                        child: Center(
+                                          child: Text(
+                                            "Discover products",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                color: GlobalColors.offWhite,
+                                                fontSize: 15),
+                                          ),
+                                        ),
+                                      ),
+                                      decoration: BoxDecoration(
+                                          shape: BoxShape.rectangle,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: GlobalColors.blue),
+                                    ),
+                                  ),
+                                ),
+                              ])),
+                    )
+                  : GridView.builder(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 12,
+                          crossAxisSpacing: 13,
+                          mainAxisExtent: 320),
+                      itemCount: get.wishlist.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        var item = get.wishlist[index];
+                        return get1.loading
+                            ? Shimmer.fromColors(
+                                baseColor: GlobalColors.offWhite,
+                                highlightColor: GlobalColors.gray,
+                                child: ProductCard(
+                                  selcetContainer: () {
                                     Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                BottomNavigation()));
+                                                ViewproductScreen(
+                                                  id: item.id,
+                                                )));
                                   },
-                                  child: Container(
-                                    width: 400,
-                                    height: 50,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(7.0),
-                                      child: Center(
-                                        child: Text(
-                                          "Discover products",
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              color: GlobalColors.offWhite,
-                                              fontSize: 15),
-                                        ),
-                                      ),
-                                    ),
-                                    decoration: BoxDecoration(
-                                        shape: BoxShape.rectangle,
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: GlobalColors.blue),
-                                  ),
-                                ),
-                              ),
-                            ])),
-                  )
-                : GridView.builder(
-                    shrinkWrap: true,
-                    padding: EdgeInsets.zero,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 12,
-                        crossAxisSpacing: 13,
-                        mainAxisExtent: 320),
-                    itemCount: get.wishlist.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      var item = get.wishlist[index];
-                      return get1.loading
-                          ? Shimmer.fromColors(
-                              baseColor: GlobalColors.offWhite,
-                              highlightColor: GlobalColors.gray,
-                              child: ProductCard(
+                                  wishlist: () {
+                                    get.toggleWishlist(item);
+                                    if (get.isWishlisted(item.id)) {
+                                      return success(
+                                          context: context,
+                                          message:
+                                              '${item.name} removed from wishlist');
+                                    } else {
+                                      return success(
+                                          context: context,
+                                          message:
+                                              '${item.name} added to wishlist');
+                                    }
+                                  },
+                                  cartBtn: () {
+                                    var items = CartModel(
+                                        id: item.id,
+                                        name: item.name,
+                                        colour: 'black',
+                                        size: '',
+                                        price: item.currentPrice[0].ngn[0],
+                                        count: 1,
+                                        img: "${item.photos[0].url}",
+                                        color: GlobalColors.black);
+                                    get2.addToCart(items);
+                                    success(
+                                        context: context,
+                                        message: '${item.name} added to cart');
+                                  },
+                                  productImg:
+                                      "https://api.timbu.cloud/images/${item.photos[0].url}",
+                                  pbrand: '${item.urlSlug}',
+                                  pname: '${item.name}',
+                                  pRating: '4.5',
+                                  stock: "${item.availableQuantity}",
+                                  pCurrentPrice:
+                                      '₦${item.currentPrice[0].ngn[0]}0',
+                                  oldPrice: '₦ 45,000.00',
+                                  isWishlisted: get.isWishlisted(item.id),
+                                ))
+                            : ProductCard(
                                 selcetContainer: () {
                                   Navigator.push(
                                       context,
@@ -177,57 +229,10 @@ class _WishListPageState extends State<WishListPage> {
                                     '₦${item.currentPrice[0].ngn[0]}0',
                                 oldPrice: '₦ 45,000.00',
                                 isWishlisted: get.isWishlisted(item.id),
-                              ))
-                          : ProductCard(
-                              selcetContainer: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ViewproductScreen(
-                                              id: item.id,
-                                            )));
-                              },
-                              wishlist: () {
-                                get.toggleWishlist(item);
-                                if (get.isWishlisted(item.id)) {
-                                  return success(
-                                      context: context,
-                                      message:
-                                          '${item.name} removed from wishlist');
-                                } else {
-                                  return success(
-                                      context: context,
-                                      message:
-                                          '${item.name} added to wishlist');
-                                }
-                              },
-                              cartBtn: () {
-                                var items = CartModel(
-                                    id: item.id,
-                                    name: item.name,
-                                    colour: 'black',
-                                    size: '',
-                                    price: item.currentPrice[0].ngn[0],
-                                    count: 1,
-                                    img: "${item.photos[0].url}",
-                                    color: GlobalColors.black);
-                                get2.addToCart(items);
-                                success(
-                                    context: context,
-                                    message: '${item.name} added to cart');
-                              },
-                              productImg:
-                                  "https://api.timbu.cloud/images/${item.photos[0].url}",
-                              pbrand: '${item.urlSlug}',
-                              pname: '${item.name}',
-                              pRating: '4.5',
-                              stock: "${item.availableQuantity}",
-                              pCurrentPrice: '₦${item.currentPrice[0].ngn[0]}0',
-                              oldPrice: '₦ 45,000.00',
-                              isWishlisted: get.isWishlisted(item.id),
-                            );
-                    }),
-          ],
+                              );
+                      }),
+            ],
+          ),
         ),
       ),
     );
