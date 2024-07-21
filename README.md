@@ -48,7 +48,8 @@ nike_store is a simple mobile application that allows users to browse through pr
 - lottie: ^3.1.2
 
 ## note 2
-- users can add product to cart from the viewproduct page cause of the api that was given and also add to wishList
+- a users can view featured products add product to cart from the viewproduct page ,home page,list of products page and also add to wishList
+- once an order is taken it will become active order then after one min it becomes a completed order
 
 ## Installation
 
@@ -88,7 +89,7 @@ Follow these steps to set up the project locally:
 ![Cart Page](assets/screenshot/cartPage.png) ![Empty Cart Page](assets/screenshot/cartpage2.png)
 
 7. **WishList Page**
-![WishList Page](assets/screenshot/wishlistPage.png)
+![WishList Page](assets/screenshot/wishlistPage.png) ![Empty WishList Page](assets/screenshot/emptywishlist.png)
 
 8. **ActiveOrder Page**
 ![ActiveOrder Page](assets/screenshot/activeOrderpage.png)![Empty ActiveOrder Page](assets/screenshot/emptyActiveorder.png)
