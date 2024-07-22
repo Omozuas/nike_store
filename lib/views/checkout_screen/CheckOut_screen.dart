@@ -531,6 +531,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               InkWell(
                 onTap: () {
                   showModalBottomSheet(
+                      isScrollControlled: true,
                       context: context,
                       builder: (BuildContext context) {
                         return Padding(
